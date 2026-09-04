@@ -1,8 +1,9 @@
-namespace Airox.Client.Core.StateMachine;
-
-public interface IGameState
+namespace Airox.Client.Core.StateMachine
 {
-    void Enter();
-    void Exit();
-    void Tick(float deltaTime);
+    public interface IGameState
+    {
+        void Enter();
+        void Exit();
+        void Tick(float deltaTime);
+    }
 }
