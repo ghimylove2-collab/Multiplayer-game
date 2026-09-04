@@ -21,7 +21,7 @@ namespace Airox.Editor
                 options = BuildOptions.None
             });
             if (report.summary.result != BuildResult.Succeeded)
-                throw new UnityEditor.Build.System.Exception(report.summary.ToString());
+                throw new System.Exception(report.summary.ToString());
             Debug.Log($"[Airox] APK built: {output}");
         }
     }
