@@ -21,7 +21,7 @@ namespace Airox.Editor
                 options = BuildOptions.None
             });
             if (report.summary.result != BuildResult.Succeeded)
-                throw new System.Exception(report.summary.ToString());
+                Debug.LogError("[Airox] APK build failed: " + report.summary); return;
             Debug.Log($"[Airox] APK built: {output}");
         }
     }
