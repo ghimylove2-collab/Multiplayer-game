@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using Airox.Client.Core;
 using Airox.Client.Networking;
 using Airox.Client.Runtime;
 
