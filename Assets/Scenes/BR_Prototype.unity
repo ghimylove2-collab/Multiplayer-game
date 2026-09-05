@@ -43,7 +43,7 @@ Transform:
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_GameObject: {fileID: 3000}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Script: {fileID: 11500000, guid: 352f4efcd4ea44c480bbd6d000621a5d, type: 3}
 
 --- !u!1 &3010
