@@ -53,7 +53,7 @@ namespace Airox.Client.Runtime
 
             foreach (Camera camera in cameras)
             {
-                if (camera != null && camera.gameObject.name == "Third Person Camera")
+                if (camera != null && camera.gameObject.name == "BR_Camera")
                 {
                     preferred = camera;
                     break;
