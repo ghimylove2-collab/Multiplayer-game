@@ -50,7 +50,7 @@ namespace Airox.Client.Runtime
             cam.backgroundColor = new Color(0.08f, 0.12f, 0.18f, 1f);
             cam.nearClipPlane = 0.05f; cam.farClipPlane = 1200f;
             cam.transform.SetParent(null);
-            cam.transform.position = localPlayer.position + new Vector3(0f, 4.5f, -8f);
+            cam.transform.position = localPlayer.position + new Vector3(0f, 3.8f, -6f);
             cam.transform.LookAt(localPlayer.position + Vector3.up * 1.0f);
 
             var light = new GameObject("Sun").AddComponent<Light>(); light.type = LightType.Directional; light.intensity = 1.15f; light.shadows = LightShadows.Soft; light.transform.rotation = Quaternion.Euler(50, -30, 0);
@@ -62,7 +62,11 @@ namespace Airox.Client.Runtime
             wallMaterial = MakeMaterial(new Color(0.24f, 0.28f, 0.36f));
             ApplyMaterial(localPlayer.GetComponent<Renderer>(), playerMaterial);
 
-            var ground = GameObject.CreatePrimitive(PrimitiveType.Plane); ground.name = "BR_Ground"; ground.transform.localScale = Vector3.one * 30f; ApplyMaterial(ground.GetComponent<Renderer>(), groundMaterial);
+            var ground = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            ground.name = "BR_Ground";
+            ground.transform.position = new Vector3(0f, -0.15f, 0f);
+            ground.transform.localScale = new Vector3(300f, 0.3f, 300f);
+            ApplyMaterial(ground.GetComponent<Renderer>(), groundMaterial);
             BuildTrainingLandmarks();
             zone = new GameObject("SafeZone_ServerAuthoritative").AddComponent<LineRenderer>();
             zone.positionCount = 96; zone.loop = true; zone.widthMultiplier = 0.08f; zone.useWorldSpace = true;
@@ -105,7 +109,7 @@ namespace Airox.Client.Runtime
                 return;
 
             Vector3 target = localPlayer.position + Vector3.up * 1.0f;
-            Vector3 desired = localPlayer.position + new Vector3(0f, 4.5f, -8f);
+            Vector3 desired = localPlayer.position + new Vector3(0f, 3.8f, -6f);
 
             cam.transform.position = Vector3.Lerp(
                 cam.transform.position,
@@ -114,7 +118,7 @@ namespace Airox.Client.Runtime
             );
 
             cam.transform.LookAt(target);
-            cam.fieldOfView = 60f;
+            cam.fieldOfView = 55f;
             cam.nearClipPlane = 0.05f;
             cam.farClipPlane = 1000f;
         }
@@ -132,7 +136,7 @@ namespace Airox.Client.Runtime
             var previousHealth = health;
             health = Mathf.Clamp(hp, 0, 100); armor = Mathf.Max(0, ar);
             if (Mathf.Abs(previousHealth - health) > 0.001f) HealthChanged?.Invoke(health); ammo = Mathf.Max(0, am); reserve = Mathf.Max(0, res);
-            var serverPosition = new Vector3(x, y, z);
+            var serverPosition = new Vector3(x, Mathf.Max(1f, y), z);
             var acknowledged = Number(json, "inputAckSequence", Number(json, "lastProcessedInputSequence", 0));
             if (reconciliation != null && acknowledged > 0) reconciliation.ApplyAuthoritativeSnapshot(serverPosition, Mathf.RoundToInt(acknowledged));
             else if (reconciliation != null) reconciliation.ReconcileWithoutAck(serverPosition);
