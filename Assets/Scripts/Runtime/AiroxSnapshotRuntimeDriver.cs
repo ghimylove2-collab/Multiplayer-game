@@ -40,7 +40,7 @@ namespace Airox.Client.Runtime
         {
             localPlayer = GameObject.CreatePrimitive(PrimitiveType.Capsule).transform;
             localPlayer.name = "LocalPlayer_ServerDriven";
-            localPlayer.position = Vector3.zero;
+            localPlayer.position = new Vector3(0f, 1f, 0f);
             localPlayer.gameObject.AddComponent<CharacterController>();
             localPlayer.gameObject.AddComponent<AiroxMobileThirdPersonController>();
             reconciliation = localPlayer.gameObject.AddComponent<AiroxClientMovementReconciliation>();
@@ -49,7 +49,9 @@ namespace Airox.Client.Runtime
             cam.clearFlags = CameraClearFlags.SolidColor;
             cam.backgroundColor = new Color(0.08f, 0.12f, 0.18f, 1f);
             cam.nearClipPlane = 0.05f; cam.farClipPlane = 1200f;
-            cam.transform.SetParent(localPlayer); cam.transform.localPosition = new Vector3(0, 3.5f, -6f); cam.transform.localRotation = Quaternion.Euler(18, 0, 0);
+            cam.transform.SetParent(null);
+            cam.transform.position = localPlayer.position + new Vector3(0f, 4.5f, -8f);
+            cam.transform.LookAt(localPlayer.position + Vector3.up * 1.0f);
 
             var light = new GameObject("Sun").AddComponent<Light>(); light.type = LightType.Directional; light.intensity = 1.15f; light.shadows = LightShadows.Soft; light.transform.rotation = Quaternion.Euler(50, -30, 0);
             RenderSettings.ambientLight = new Color(0.32f, 0.36f, 0.44f);
@@ -69,8 +71,9 @@ namespace Airox.Client.Runtime
 
         private Material MakeMaterial(Color color)
         {
-            var shader = Shader.Find("Standard");
+            var shader = Resources.Load<Shader>("AiroxRuntimeUnlit");
             if (shader == null) shader = Shader.Find("Unlit/Color");
+            if (shader == null) shader = Shader.Find("Standard");
             var material = new Material(shader); material.color = color;
             return material;
         }
@@ -94,6 +97,26 @@ namespace Airox.Client.Runtime
         private static void CreateBlock(string name, Vector3 position, Vector3 scale, Material material)
         {
             var block = GameObject.CreatePrimitive(PrimitiveType.Cube); block.name = name; block.transform.position = position; block.transform.localScale = scale; ApplyMaterial(block.GetComponent<Renderer>(), material);
+        }
+
+        private void LateUpdate()
+        {
+            if (cam == null || localPlayer == null)
+                return;
+
+            Vector3 target = localPlayer.position + Vector3.up * 1.0f;
+            Vector3 desired = localPlayer.position + new Vector3(0f, 4.5f, -8f);
+
+            cam.transform.position = Vector3.Lerp(
+                cam.transform.position,
+                desired,
+                1f - Mathf.Exp(-10f * Time.deltaTime)
+            );
+
+            cam.transform.LookAt(target);
+            cam.fieldOfView = 60f;
+            cam.nearClipPlane = 0.05f;
+            cam.farClipPlane = 1000f;
         }
 
         private void ApplySnapshot(string json)
