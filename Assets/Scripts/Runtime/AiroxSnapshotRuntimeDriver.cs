@@ -12,6 +12,7 @@ namespace Airox.Client.Runtime
         [SerializeField] private AiroxUnityRealtimeClient realtime;
         [SerializeField] private BattleRoyaleClientState state;
         private Transform localPlayer;
+        private Transform ground;
         private Camera cam;
         private LineRenderer zone;
         private AiroxRuntimeHud hud;
@@ -62,11 +63,14 @@ namespace Airox.Client.Runtime
             wallMaterial = MakeMaterial(new Color(0.24f, 0.28f, 0.36f));
             ApplyMaterial(localPlayer.GetComponent<Renderer>(), playerMaterial);
 
-            var ground = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            ground.name = "BR_Ground";
-            ground.transform.position = new Vector3(0f, -0.15f, 0f);
-            ground.transform.localScale = new Vector3(300f, 0.3f, 300f);
-            ApplyMaterial(ground.GetComponent<Renderer>(), groundMaterial);
+            var groundObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            groundObject.name = "BR_Ground_FollowingServerPlayer";
+            ground = groundObject.transform;
+            ground.position = new Vector3(0f, -0.15f, 0f);
+            ground.localScale = new Vector3(4000f, 0.3f, 4000f);
+            var groundRenderer = groundObject.GetComponent<Renderer>();
+            ApplyMaterial(groundRenderer, groundMaterial);
+            if (groundRenderer != null) groundRenderer.enabled = true;
             BuildTrainingLandmarks();
             zone = new GameObject("SafeZone_ServerAuthoritative").AddComponent<LineRenderer>();
             zone.positionCount = 96; zone.loop = true; zone.widthMultiplier = 0.08f; zone.useWorldSpace = true;
@@ -107,6 +111,10 @@ namespace Airox.Client.Runtime
         {
             if (cam == null || localPlayer == null)
                 return;
+
+            // Visual collision surface only. The server remains authoritative for player position.
+            if (ground != null)
+                ground.position = new Vector3(localPlayer.position.x, -0.15f, localPlayer.position.z);
 
             Vector3 target = localPlayer.position + Vector3.up * 1.0f;
             Vector3 desired = localPlayer.position + new Vector3(0f, 3.8f, -6f);
